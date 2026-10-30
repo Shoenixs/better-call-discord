@@ -1,0 +1,16 @@
+node_modules/
+coverage/
+*.config.json
+*.backup.*
+*.log
+.DS_Store
+Thumbs.db
+.env
+.env.*
+
+# Personal ringtone files never belong in the repository.
+*.mp3
+*.wav
+*.ogg
+*.m4a
+*.flac

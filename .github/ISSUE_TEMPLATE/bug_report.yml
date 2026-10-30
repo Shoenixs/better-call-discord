@@ -1,0 +1,22 @@
+name: Ошибка
+description: Сообщить об ошибке Better Call Discord
+body:
+  - type: input
+    id: versions
+    attributes:
+      label: Версии и платформа
+      description: Версии плагина, Discord, BetterDiscord и операционная система.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Как воспроизвести
+      description: Шаги, ожидаемый результат и что происходит на самом деле.
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Диагностика
+      description: Работает ли «Послушать»? Какой статус подключения? Удали личные пути, токены и любые данные переписки.
