@@ -1,5 +1,13 @@
 # История версий
 
+## 1.1.0 — 2026-10-31
+
+- Added English and Russian UI, notifications, errors and file dialog text.
+- Added a saved language selector: Auto (Discord), English and Russian. Unsupported locales fall back to English.
+- Published an English README and a separate Russian README with language links.
+- Добавлен выбор языка без сброса мелодии и настроек громкости.
+- Added localization tests alongside the audio regression checks.
+
 ## 1.0.5 — 2026-10-31
 
 - Сохранён исходный `this` при пропуске обычных сигналов и возврате штатного звонка. Исправляет исчезновение остальных звуков Discord.

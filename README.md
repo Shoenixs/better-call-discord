@@ -1,76 +1,90 @@
 # Better Call Discord
 
-Свой звук звонка в BetterDiscord с плавным нарастанием громкости.
+**English** | [Русский](./README.ru.md)
 
-Выбери локальную мелодию и задай, с какой громкости начинать звонок, до какого уровня её поднимать и за сколько секунд. Дополнительные библиотеки и сборка для установки не нужны: весь плагин находится в `BetterCallDiscord.plugin.js`.
+A custom local ringtone with gradually increasing volume for BetterDiscord.
 
-## Возможности
+Choose an audio file, set the starting and maximum volume, and decide how long the fade-in should take. The plugin is a single `BetterCallDiscord.plugin.js` file. No build step or additional libraries are required to install it.
 
-- Локальный MP3, WAV, OGG, M4A или FLAC размером до 20 МБ. Поддержка кодеков зависит от клиента; MP3 или WAV — предпочтительные варианты.
-- Линейное нарастание от начальной до максимальной громкости за 1–60 секунд.
-- Повтор мелодии до прекращения сигнала звонка; новый звонок начинает нарастание заново.
-- Кнопки «Послушать» и «Стоп» для проверки настроек.
-- Поддержка сезонных и редких вариантов мелодии входящего звонка.
-- Возврат штатного звука при ошибке пользовательского файла.
-- Сохранение настроек и перенос конфигурации ранних версий GentleRing.
+## Features
 
-По умолчанию: **5% → 70% за 15 секунд**. Обычные звуки подключения, отключения, микрофона, наушников и уведомлений проходят в Discord с исходными аргументами и объектом метода.
+- Local MP3, WAV, OGG, M4A or FLAC files up to 20 MB. Codec support depends on the client; MP3 or WAV is recommended.
+- Linear volume ramp from your starting level to your maximum over 1–60 seconds.
+- Looping playback while the call is ringing; each new call starts the ramp again.
+- **Listen** and **Stop** buttons to preview your settings.
+- English and Russian settings, descriptions, status messages, file dialog and notifications.
+- Automatic language selection from Discord, plus a manual language override.
+- Seasonal and rare incoming ringtone variants.
+- Default ringtone fallback if your audio file fails to load or play.
+- Saved settings and migration from early GentleRing versions.
 
-## Установка
+Defaults: **5% → 70% over 15 seconds**. Other sounds, such as joining/leaving voice channels, mute/deafen and notifications, are passed through to Discord with their original receiver and arguments.
 
-1. Установи [BetterDiscord](https://betterdiscord.app/), если он ещё не установлен.
-2. Скачай [`BetterCallDiscord.plugin.js`](https://raw.githubusercontent.com/Shoenixs/better-call-discord/main/BetterCallDiscord.plugin.js). Если браузер показывает код, сохрани страницу как `BetterCallDiscord.plugin.js`: файл должен содержать JavaScript, а не HTML страницы.
-3. В Discord открой **Настройки → BetterDiscord → Plugins → Open Plugins Folder**.
-4. Помести туда `BetterCallDiscord.plugin.js` и включи **Better Call Discord**.
-5. Открой настройки плагина, нажми **«Выбрать файл»** и укажи свою мелодию.
-6. Задай громкость и время нарастания, затем нажми **«Послушать»**.
+## Installation
 
-В Windows папка плагинов обычно находится по адресу `%AppData%\BetterDiscord\plugins`. При обновлении замени существующий файл. Удали или отключи старый `GentleRing.plugin.js`, чтобы две версии не работали одновременно.
+1. Install [BetterDiscord](https://betterdiscord.app/) if you do not already use it.
+2. Download [`BetterCallDiscord.plugin.js` from the latest release](https://github.com/Shoenixs/better-call-discord/releases/latest/download/BetterCallDiscord.plugin.js).
+3. In Discord, open **Settings → BetterDiscord → Plugins → Open Plugins Folder**.
+4. Place `BetterCallDiscord.plugin.js` in that folder and enable **Better Call Discord**.
+5. Open its settings, click **Choose file**, and select your ringtone.
+6. Adjust the volume and duration, then click **Listen**.
 
-## Настройки и поведение
+On Windows, the plugin folder is usually `%AppData%\BetterDiscord\plugins`. To update, replace the existing plugin file. Remove or disable any old `GentleRing.plugin.js` installation so both versions do not run together.
 
-| Настройка | Значение |
+The [source file](https://raw.githubusercontent.com/Shoenixs/better-call-discord/main/BetterCallDiscord.plugin.js) is also available directly. If the browser displays code, save it as `BetterCallDiscord.plugin.js`; do not save the GitHub HTML page as a plugin.
+
+## Language
+
+Choose **Language → Auto (Discord)**, **English** or **Русский** in the plugin settings.
+
+Auto uses Discord's language when available, then the system/browser language. Russian locales use Russian; all other locales use English. Your manual choice is saved, and switching languages updates the settings immediately without changing the ringtone or volume.
+
+BetterDiscord's own modal title and standard controls follow BetterDiscord's language rather than the plugin's override.
+
+## Settings and behavior
+
+| Setting | Behavior |
 | --- | --- |
-| Начальная громкость | 0–100%; применяется в начале каждого звонка |
-| Максимальная громкость | 0–100%; не ниже начальной |
-| Время нарастания | 1–60 секунд |
-| Сигнал | По умолчанию `call_ringing` — входящий звонок |
+| Starting volume | 0–100%; applied at the start of each call |
+| Maximum volume | 0–100%; cannot be lower than the starting level |
+| Fade-in duration | 1–60 seconds |
+| Sound to replace | `call_ringing` by default: incoming calls |
 
-Новые уровни громкости действуют со следующего звонка или проверки. Проверка сама останавливается через 5 секунд после достижения максимума. Альтернативный `call_calling` относится к исходящему сигналу в проверенном клиенте; выбирай его только если намеренно хочешь менять этот звук.
+Volume changes apply to the next call or preview. The preview stops automatically 5 seconds after reaching maximum volume. In the verified client, the alternative `call_calling` signal is for outgoing calls; select it only if you want to replace that signal.
 
-Плагин заменяет воспроизведение, которое запросил Discord. Он не принуждает клиент звонить при выключенном сигнале или подавлении звуков. Проценты задают громкость аудиоэлемента; системная громкость и микшер приложений тоже влияют на результат. Пользовательская мелодия использует стандартный аудиовыход приложения. Отдельный выбор устройства и привязка к ползунку громкости уведомлений Discord не реализованы.
+The plugin replaces playback requested by Discord. It does not force ringing when sounds are disabled or suppressed by the client. Percentages control the audio element; system volume and the application mixer also affect the result. Your custom ringtone uses the application's default audio output. A separate output device selector and integration with Discord's notification volume control are not implemented.
 
-## Локальные данные
+## Local data and privacy
 
-Плагин не делает сетевых запросов, не загружает зависимости и не обновляется автоматически. Конфигурация BetterDiscord содержит путь к выбранному файлу, уровни громкости и небольшую техническую диагностику: версию плагина, обнаруженные методы, последнее имя перехваченного звука и событие остановки.
+The plugin makes no network requests, downloads no dependencies and does not update automatically. BetterDiscord's configuration stores your audio file path, language, volume settings and a small technical diagnostic record: plugin version, discovered methods, last intercepted sound name and stop event.
 
-Мелодия никуда не отправляется и в плагин не встраивается. После выбора не перемещай и не удаляй файл. Конфигурации, личные пути и аудиофайлы не входят в этот репозиторий. Не прикладывай конфигурацию к публичному issue целиком: в ней может быть личный путь.
+Your ringtone is not uploaded or embedded in the plugin. Keep the selected file at its original location. Personal configurations, paths and audio recordings are not included in this repository. Do not attach your full configuration to a public issue: it may contain a personal path.
 
-## Если что-то не работает
+## Troubleshooting
 
-- **«Послушать» недоступно:** сначала выбери поддерживаемый аудиофайл.
-- **Проверка работает, но звонок стандартный:** проверь статус в «Подключение к Discord», нажми «Проверить снова» и оставь сигнал `call_ringing`. Внутренние модули Discord могут меняться после обновлений.
-- **Две мелодии одновременно:** отключи другие плагины, которые меняют сигнал звонка, и проверь, что GentleRing удалён или отключён.
-- **Нет штатных звуков:** используй версию 1.0.5 или новее; она исправляет потерю `this` при вызове оригинальных методов.
-- **Нужно вернуть стандартное поведение:** отключи Better Call Discord. Плагин снимает перехваты и останавливает своё аудио.
+- **Listen is disabled:** select a supported audio file first.
+- **Preview works but calls use Discord's ringtone:** check **Discord connection**, click **Check again**, and use `call_ringing`. Discord updates may change internal sound modules.
+- **Two ringtones play:** disable other ringtone replacement plugins and remove or disable GentleRing.
+- **Other Discord sounds are missing:** use version 1.0.5 or newer, which preserves the original `this` when passing through native sounds.
+- **Restore default behavior:** disable Better Call Discord. It removes its patches and stops its custom audio.
 
-В issue укажи версию плагина, Discord и BetterDiscord, ожидаемое и фактическое поведение. Не публикуй токены, сообщения и личные пути.
+When reporting an issue, include your plugin, Discord and BetterDiscord versions, platform, expected behavior and actual behavior. Remove tokens, messages and personal paths. English and Russian reports are welcome.
 
-## Проверка и разработка
+## Development and validation
 
-Нужен Node.js 22 или новее. Устанавливать npm-зависимости не требуется.
+Use Node.js 22 or newer. There are no npm dependencies to install.
 
 ```sh
 npm run check
 npm test
 ```
 
-Тесты проверяют нарастание, повторные запросы, остановку и очистку таймеров, возврат штатного звука, бинарное чтение через неполный `fs` BetterDiscord, современные и старые классы звука, скрытые и отложенно загруженные модули, сохранение `this` для остальных сигналов. Аудиоданные для тестов генерируются в памяти.
+Tests cover the ramp, repeated playback requests, stopping and timer cleanup, native fallback, binary audio reading through BetterDiscord's partial `fs` implementation, modern and legacy sound classes, hidden/lazy modules, receiver preservation for other sounds, and language selection. Test audio is generated in memory.
 
-Пользователь подтвердил свою мелодию и нарастание на реальном входящем звонке в версии 1.0.4. Исправление остальных сигналов в 1.0.5 покрыто регрессионными тестами; отдельного пользовательского подтверждения их восстановления пока нет. Программные тесты не заменяют проверку звука в конкретном клиенте. Инструкция для ручного прогона находится в [TESTING.md](./TESTING.md).
+A user confirmed the custom ringtone and fade-in on an actual incoming call in version 1.0.4. The native sound fix in 1.0.5 and localization in 1.1.0 have automated regression coverage; they have not received separate user confirmation in the client. Automated tests do not replace audible checks in your installed client. See [TESTING.md](./TESTING.md) for a manual checklist.
 
-Для интеграции используются [Webpack](https://docs.betterdiscord.app/api/Webpack.html), [Patcher](https://docs.betterdiscord.app/api/Patcher.html) и [UI](https://docs.betterdiscord.app/api/UI) BetterDiscord. Номера webpack-модулей не зафиксированы. Поддерживаются классы с `ensureAudio()` и `_ensureAudio()`; обновление Discord может потребовать нового адаптера.
+Integration uses BetterDiscord's [Webpack](https://docs.betterdiscord.app/api/Webpack.html), [Patcher](https://docs.betterdiscord.app/api/Patcher.html) and [UI](https://docs.betterdiscord.app/api/UI) APIs. Webpack module IDs are not hardcoded. Both `ensureAudio()` and `_ensureAudio()` sound classes are supported; a Discord update may require a new adapter.
 
-## Лицензия
+## License
 
-[MIT](./LICENSE). Независимо написанный плагин; сторонние библиотеки и аудиозаписи не включены. Проект не связан с Discord, BetterDiscord или правообладателями Better Call Saul.
+[MIT](./LICENSE). Independently written plugin; no third-party libraries or audio recordings are bundled. This project is not affiliated with Discord, BetterDiscord or the rights holders of Better Call Saul.

@@ -1,16 +1,112 @@
 /**
  * @name Better Call Discord
  * @author Shoenixs
- * @version 1.0.5
- * @description Свой локальный звук входящего звонка с плавно возрастающей громкостью.
+ * @version 1.1.0
+ * @description Custom local ringtone with gradually increasing volume. English and Russian settings.
  * @license MIT
  * @website https://github.com/Shoenixs/better-call-discord
  * @source https://github.com/Shoenixs/better-call-discord/blob/main/BetterCallDiscord.plugin.js
  */
 
 const NAME = "Better Call Discord";
-const VERSION = "1.0.5";
-const DEFAULTS = {file: "", start: 5, end: 70, seconds: 15, sound: "call_ringing"};
+const VERSION = "1.1.0";
+const DEFAULTS = {file: "", start: 5, end: 70, seconds: 15, sound: "call_ringing", language: "auto"};
+const MESSAGES = {
+    en: {
+        disabled: "The plugin is disabled.",
+        connected: "Sound module found. Check an incoming call to confirm playback.",
+        waiting: "Waiting for Discord's sound module to load. Default sounds still work.",
+        missingModule: "Discord's sound module was not found. The default ringtone is unchanged.",
+        language: "Language",
+        languageNote: "Auto follows Discord's language, with the system language as a fallback. Other languages use English.",
+        auto: "Auto (Discord)",
+        ringtone: "Ringtone",
+        loading: "Loading…",
+        chooseFile: "Choose file",
+        ready: "Ready",
+        notLoaded: "Not loaded",
+        fileNote: "Local MP3, WAV, OGG, M4A or FLAC, up to 20 MB. Your file is never uploaded.",
+        chooseTitle: "Choose a ringtone",
+        audioFiles: "Audio",
+        openFailed: "Could not open the file. {error}",
+        startVolume: "Starting volume, %",
+        startNote: "Each call starts at this volume.",
+        endVolume: "Maximum volume, %",
+        endNote: "Volume gradually rises to this level and stays there. Discord and system volume also affect playback.",
+        rampTime: "Fade-in duration, seconds",
+        rampNote: "1–60 seconds. Changes apply to the next call or preview.",
+        preview: "Preview fade-in",
+        previewNote: "The preview stops automatically 5 seconds after reaching maximum volume.",
+        listen: "Listen",
+        stopPreview: "Stop preview",
+        stop: "Stop",
+        signal: "Sound to replace",
+        signalNote: "Use call_ringing for incoming calls. In some clients, call_calling is the outgoing call signal.",
+        incomingOption: "call_ringing (default)",
+        alternativeOption: "call_calling (alternative)",
+        connection: "Discord connection",
+        retry: "Check again",
+        absolutePath: "Choose a local file using an absolute path.",
+        fileSize: "Choose a non-empty audio file up to 20 MB.",
+        binaryMode: "BetterDiscord returned text instead of audio data. Binary file reading is required.",
+        tooLarge: "The file is larger than 20 MB.",
+        fileReady: "Your audio file is ready. You can preview it now.",
+        loadFailed: "Could not load the audio file. {error}",
+        missingFs: "BetterDiscord does not provide fs.{method}. Update BetterDiscord.",
+        timeout: "Loading took more than 10 seconds. Try MP3 or WAV.",
+        unsupported: "The audio format is not supported. Try MP3 or WAV.",
+        chooseFirst: "Choose an audio file first.",
+        playbackFailed: "Could not play the file. Calls will use the default ringtone.",
+        previewFailed: "Could not play the preview. Try selecting another audio file."
+    },
+    ru: {
+        disabled: "Плагин выключен.",
+        connected: "Звуковой модуль найден. Нужна проверка входящего звонка.",
+        waiting: "Ожидаю загрузки звукового модуля Discord. Штатный звук работает.",
+        missingModule: "Звуковой модуль Discord не найден. Штатный звук звонка сохранён.",
+        language: "Язык",
+        languageNote: "Автовыбор использует язык Discord, а если он недоступен — язык системы. Для остальных языков используется английский.",
+        auto: "Автоматически (Discord)",
+        ringtone: "Звук звонка",
+        loading: "Загрузка…",
+        chooseFile: "Выбрать файл",
+        ready: "Готов",
+        notLoaded: "Не загружен",
+        fileNote: "Локальный MP3, WAV, OGG, M4A или FLAC, до 20 МБ. Файл никуда не отправляется.",
+        chooseTitle: "Выбери звук звонка",
+        audioFiles: "Аудио",
+        openFailed: "Не удалось открыть файл. {error}",
+        startVolume: "Начальная громкость, %",
+        startNote: "С этой громкости начинается каждый звонок.",
+        endVolume: "Максимальная громкость, %",
+        endNote: "Громкость плавно поднимется до этого уровня и останется на нём. Общая громкость Discord и системы тоже влияет на звук.",
+        rampTime: "Время нарастания, секунд",
+        rampNote: "От 1 до 60 секунд. Изменения применяются со следующего звонка или проверки.",
+        preview: "Проверить нарастание",
+        previewNote: "Проверка завершится через 5 секунд после достижения максимальной громкости.",
+        listen: "Послушать",
+        stopPreview: "Остановить проверку",
+        stop: "Стоп",
+        signal: "Какой сигнал заменять",
+        signalNote: "Для входящего звонка используется call_ringing. В некоторых клиентах call_calling относится к исходящему вызову.",
+        incomingOption: "call_ringing (по умолчанию)",
+        alternativeOption: "call_calling (альтернативный сигнал)",
+        connection: "Подключение к Discord",
+        retry: "Проверить снова",
+        absolutePath: "Выбери локальный файл с абсолютным путём.",
+        fileSize: "Нужен непустой аудиофайл размером до 20 МБ.",
+        binaryMode: "BetterDiscord вернул текст вместо аудиоданных. Нужен бинарный режим чтения.",
+        tooLarge: "Файл больше 20 МБ.",
+        fileReady: "Аудиофайл готов. Можно проверить звук.",
+        loadFailed: "Не удалось загрузить звук. {error}",
+        missingFs: "BetterDiscord не предоставляет fs.{method}. Обнови BetterDiscord.",
+        timeout: "Загрузка заняла больше 10 секунд. Попробуй MP3 или WAV.",
+        unsupported: "Формат не поддерживается. Попробуй MP3 или WAV.",
+        chooseFirst: "Сначала выбери аудиофайл.",
+        playbackFailed: "Не удалось воспроизвести файл. Для звонка возвращён штатный звук.",
+        previewFailed: "Не удалось воспроизвести проверку. Попробуй выбрать другой аудиофайл."
+    }
+};
 const clamp = (value, min, max, fallback) => {
     const number = Number(value);
     return Number.isFinite(number) ? Math.min(max, Math.max(min, number)) : fallback;
@@ -23,12 +119,13 @@ module.exports = class BetterCallDiscord {
         this.sessions = new Map();
         this.unpatches = [];
         this.listeners = new Set();
-        this.status = "Плагин выключен.";
+        this.statusKey = "disabled";
     }
 
     start() {
         if (this.running) return;
         this.running = true;
+        this.localeStore = BdApi.Webpack.getStore?.("LocaleStore");
         const currentSettings = BdApi.Data.load(NAME, "settings");
         const saved = currentSettings || BdApi.Data.load("GentleRing", "settings") || {};
         this.settings = {
@@ -36,7 +133,8 @@ module.exports = class BetterCallDiscord {
             start: clamp(saved.start, 0, 100, DEFAULTS.start),
             end: clamp(saved.end, 0, 100, DEFAULTS.end),
             seconds: clamp(saved.seconds, 1, 60, DEFAULTS.seconds),
-            sound: saved.sound === "call_calling" ? "call_calling" : DEFAULTS.sound
+            sound: saved.sound === "call_calling" ? "call_calling" : DEFAULTS.sound,
+            language: ["en", "ru"].includes(saved.language) ? saved.language : "auto"
         };
         this.settings.end = Math.max(this.settings.start, this.settings.end);
         if (!currentSettings) BdApi.Data.save(NAME, "settings", this.settings);
@@ -48,7 +146,7 @@ module.exports = class BetterCallDiscord {
             if (this.unpatches.length || ++attempts >= 15) {
                 clearInterval(this.discovery);
                 this.discovery = null;
-                if (!this.unpatches.length) this.notify("Звуковой модуль Discord не найден. Замена звонка недоступна; штатные звуки сохранены.", "warning");
+                if (!this.unpatches.length) this.notify(this.t("missingModule"), "warning");
             }
         }, 1000);
         if (this.settings.file) void this.loadFile(this.settings.file, false);
@@ -56,6 +154,25 @@ module.exports = class BetterCallDiscord {
 
     notify(message, type = "info") {
         BdApi.UI.showToast(`${NAME}: ${message}`, {type, timeout: 6000});
+    }
+
+    getLanguage() {
+        const preference = this.settings?.language;
+        if (preference === "en" || preference === "ru") return preference;
+        let locale;
+        try { locale = this.localeStore?.getLocale?.() || this.localeStore?.locale; }
+        catch (_) { /* Use the browser locale when Discord's store is unavailable. */ }
+        if (!locale && typeof navigator !== "undefined") locale = navigator.language || navigator.languages?.[0];
+        return /^ru(?:[-_]|$)/i.test(String(locale || "")) ? "ru" : "en";
+    }
+
+    t(key, values = {}) {
+        const template = MESSAGES[this.getLanguage()][key] ?? MESSAGES.en[key] ?? key;
+        return template.replace(/\{(\w+)\}/g, (_, name) => String(values[name] ?? `{${name}}`));
+    }
+
+    get status() {
+        return this.t(this.statusKey);
     }
 
     refresh() {
@@ -107,13 +224,13 @@ module.exports = class BetterCallDiscord {
                         this.play("call", fallback, String(args[0]));
                         return Promise.resolve();
                     });
-                    if (!undo) throw new Error(`Не удалось перехватить ${method}`);
+                    if (!undo) throw new Error(`Could not patch ${method}`);
                     local.push(undo);
                 }
                 const undo = BdApi.Patcher.before(NAME, sounds, "stopSound", (_, args) => {
                     if (this.matches(args[0])) this.stopSession("call");
                 });
-                if (!undo) throw new Error("Не удалось перехватить stopSound");
+                if (!undo) throw new Error("Could not patch stopSound");
                 local.push(undo);
                 this.unpatches.push(...local);
             } catch (error) {
@@ -145,7 +262,7 @@ module.exports = class BetterCallDiscord {
                         this.play("call", () => original.apply(context, args), name);
                         return Promise.resolve();
                     });
-                    if (!undo) throw new Error(`Не удалось перехватить Sound.${method}`);
+                    if (!undo) throw new Error(`Could not patch Sound.${method}`);
                     local.push(undo);
                 }
                 const undo = BdApi.Patcher.before(NAME, Sound.prototype, "stop", context => {
@@ -154,7 +271,7 @@ module.exports = class BetterCallDiscord {
                         this.recordDiagnostics("stopped");
                     }
                 });
-                if (!undo) throw new Error("Не удалось перехватить Sound.stop");
+                if (!undo) throw new Error("Could not patch Sound.stop");
                 local.push(undo);
                 this.unpatches.push(...local);
             } catch (error) {
@@ -162,8 +279,7 @@ module.exports = class BetterCallDiscord {
                 console.warn(NAME, "Sound class could not be patched", error);
             }
         }
-        this.status = this.unpatches.length ? "Звуковой модуль найден. Нужна проверка входящего звонка." :
-            "Звуковой модуль пока не найден. Ожидаю его загрузки; штатный звук работает.";
+        this.statusKey = this.unpatches.length ? "connected" : "waiting";
         this.recordDiagnostics("discovery", {
             patchedMethods: this.unpatches.length,
             soundClasses: [...new Set(classes)].map(value => typeof value.prototype.ensureAudio === "function" ? "ensureAudio" : "_ensureAudio")
@@ -185,17 +301,17 @@ module.exports = class BetterCallDiscord {
         try {
             const fs = require("fs");
             const path = require("path");
-            if (!path.isAbsolute(file)) throw new Error("Выбери локальный файл с абсолютным путём.");
+            if (!path.isAbsolute(file)) throw new Error(this.t("absolutePath"));
             // BetterDiscord's fs polyfill has callbacks/sync methods, no promises.
             const stat = await this.readFs(fs, "stat", file);
             const isFile = typeof stat.isFile === "function" ? stat.isFile() : stat.isFile !== false && stat.isDirectory !== true;
             if (!isFile || stat.size === 0 || stat.size > 20 * 1024 * 1024) {
-                throw new Error("Нужен непустой аудиофайл размером до 20 МБ.");
+                throw new Error(this.t("fileSize"));
             }
             const bytes = await this.readFs(fs, "readFile", file);
             if (!this.running || revision !== this.revision) return false;
-            if (typeof bytes === "string") throw new Error("BetterDiscord вернул текст вместо аудиоданных. Нужен бинарный режим чтения.");
-            if (bytes.length > 20 * 1024 * 1024) throw new Error("Файл больше 20 МБ.");
+            if (typeof bytes === "string") throw new Error(this.t("binaryMode"));
+            if (bytes.length > 20 * 1024 * 1024) throw new Error(this.t("tooLarge"));
             const types = {".mp3": "audio/mpeg", ".wav": "audio/wav", ".ogg": "audio/ogg", ".m4a": "audio/mp4", ".flac": "audio/flac"};
             candidate = URL.createObjectURL(new Blob([bytes], {type: types[path.extname(file).toLowerCase()] || "application/octet-stream"}));
             await this.validateAudio(candidate);
@@ -209,12 +325,12 @@ module.exports = class BetterCallDiscord {
             this.url = candidate;
             this.settings.file = file;
             if (save) BdApi.Data.save(NAME, "settings", this.settings);
-            if (save) this.notify("Аудиофайл готов. Можно проверить звук.", "success");
+            if (save) this.notify(this.t("fileReady"), "success");
             this.refresh();
             return true;
         } catch (error) {
             if (candidate) URL.revokeObjectURL(candidate);
-            if (this.running && revision === this.revision) this.notify(`Не удалось загрузить звук. ${error.message}`, "error");
+            if (this.running && revision === this.revision) this.notify(this.t("loadFailed", {error: error.message}), "error");
             return false;
         }
     }
@@ -227,7 +343,7 @@ module.exports = class BetterCallDiscord {
             fs[method](...args, (error, value) => error ? reject(error) : resolve(value));
         });
         if (typeof fs[`${method}Sync`] === "function") return Promise.resolve(fs[`${method}Sync`](...args));
-        throw new Error(`BetterDiscord не предоставляет fs.${method}. Обнови BetterDiscord.`);
+        throw new Error(this.t("missingFs", {method}));
     }
 
     validateAudio(url) {
@@ -240,9 +356,9 @@ module.exports = class BetterCallDiscord {
                 audio.load();
                 error ? reject(error) : resolve();
             };
-            const timeout = setTimeout(() => finish(new Error("Загрузка заняла больше 10 секунд. Попробуй MP3 или WAV.")), 10000);
+            const timeout = setTimeout(() => finish(new Error(this.t("timeout"))), 10000);
             audio.oncanplay = () => finish();
-            audio.onerror = () => finish(new Error("Формат не поддерживается. Попробуй MP3 или WAV."));
+            audio.onerror = () => finish(new Error(this.t("unsupported")));
             audio.preload = "auto";
             audio.src = url;
             audio.load();
@@ -252,7 +368,7 @@ module.exports = class BetterCallDiscord {
     play(key, fallback, soundName) {
         if (!this.running || !this.url) {
             if (fallback) this.runFallback(fallback);
-            else this.notify("Сначала выбери аудиофайл.", "warning");
+            else this.notify(this.t("chooseFirst"), "warning");
             return;
         }
         const existing = this.sessions.get(key);
@@ -272,7 +388,7 @@ module.exports = class BetterCallDiscord {
                 URL.revokeObjectURL(this.url);
                 this.url = null;
             }
-            this.notify("Не удалось воспроизвести файл. Для звонка возвращён штатный звук.", "error");
+            this.notify(this.t(key === "call" ? "playbackFailed" : "previewFailed"), "error");
             if (fallback && this.running) this.runFallback(fallback);
         };
         audio.onerror = failed;
@@ -322,7 +438,7 @@ module.exports = class BetterCallDiscord {
         this.stopSession("call", true);
         if (this.url) URL.revokeObjectURL(this.url);
         this.url = null;
-        this.status = "Плагин выключен.";
+        this.statusKey = "disabled";
         this.refresh();
     }
 
@@ -334,13 +450,22 @@ module.exports = class BetterCallDiscord {
             const [busy, setBusy] = React.useState(false);
             React.useEffect(() => {
                 plugin.listeners.add(render);
+                plugin.localeStore?.addChangeListener?.(render);
                 return () => {
                     plugin.listeners.delete(render);
+                    plugin.localeStore?.removeChangeListener?.(render);
                     plugin.stopSession("preview");
                 };
             }, []);
             const settings = plugin.settings || DEFAULTS;
+            const t = (key, values) => plugin.t(key, values);
             const update = (id, value) => {
+                if (id === "language") {
+                    settings.language = ["en", "ru"].includes(value) ? value : "auto";
+                    BdApi.Data.save(NAME, "settings", settings);
+                    render();
+                    return;
+                }
                 if (!["start", "end", "seconds", "sound"].includes(id)) return;
                 plugin.stopSession("preview");
                 if (id === "sound") {
@@ -358,25 +483,27 @@ module.exports = class BetterCallDiscord {
             return BdApi.UI.buildSettingsPanel({
                 onChange: (_, id, value) => update(id, value),
                 settings: [
-                    {type: "button", id: "file", name: "Звук звонка", children: busy ? "Загрузка…" : "Выбрать файл", disabled: busy || !plugin.running,
-                        note: settings.file ? `${plugin.url ? "Готов" : "Не загружен"}: ${settings.file}` : "Локальный MP3, WAV, OGG, M4A или FLAC, до 20 МБ. Файл никуда не отправляется.",
+                    {type: "dropdown", id: "language", name: t("language"), note: t("languageNote"), value: settings.language,
+                        options: [{label: t("auto"), value: "auto"}, {label: "English", value: "en"}, {label: "Русский", value: "ru"}]},
+                    {type: "button", id: "file", name: t("ringtone"), children: busy ? t("loading") : t("chooseFile"), disabled: busy || !plugin.running,
+                        note: settings.file ? `${t(plugin.url ? "ready" : "notLoaded")}: ${settings.file}` : t("fileNote"),
                         onClick: async () => {
                             setBusy(true);
                             try {
-                                const result = await BdApi.UI.openDialog({mode: "open", title: "Выбери звук звонка", properties: ["openFile"], filters: [{name: "Аудио", extensions: ["mp3", "wav", "ogg", "m4a", "flac"]}]});
+                                const result = await BdApi.UI.openDialog({mode: "open", title: t("chooseTitle"), properties: ["openFile"], filters: [{name: t("audioFiles"), extensions: ["mp3", "wav", "ogg", "m4a", "flac"]}]});
                                 if (!result.canceled && !result.cancelled && result.filePaths?.[0]) await plugin.loadFile(result.filePaths[0]);
-                            } catch (error) { plugin.notify(`Не удалось открыть файл. ${error.message}`, "error"); }
+                            } catch (error) { plugin.notify(t("openFailed", {error: error.message}), "error"); }
                             finally { setBusy(false); render(); }
                         }},
-                    {type: "number", id: "start", name: "Начальная громкость, %", note: "С этой громкости начинается каждый звонок.", min: 0, max: 100, step: 1, value: settings.start},
-                    {type: "number", id: "end", name: "Максимальная громкость, %", note: "Громкость плавно поднимется до этого уровня и останется на нём. Общая громкость Discord и Windows тоже влияет на звук.", min: 0, max: 100, step: 1, value: settings.end},
-                    {type: "number", id: "seconds", name: "Время нарастания, секунд", note: "От 1 до 60 секунд. Изменения применяются со следующего звонка или проверки.", min: 1, max: 60, step: 1, value: settings.seconds},
-                    {type: "button", id: "preview", name: "Проверить нарастание", note: "Проверка завершится через 5 секунд после достижения максимальной громкости.", children: "Послушать", disabled: !plugin.url || !plugin.running,
+                    {type: "number", id: "start", name: t("startVolume"), note: t("startNote"), min: 0, max: 100, step: 1, value: settings.start},
+                    {type: "number", id: "end", name: t("endVolume"), note: t("endNote"), min: 0, max: 100, step: 1, value: settings.end},
+                    {type: "number", id: "seconds", name: t("rampTime"), note: t("rampNote"), min: 1, max: 60, step: 1, value: settings.seconds},
+                    {type: "button", id: "preview", name: t("preview"), note: t("previewNote"), children: t("listen"), disabled: !plugin.url || !plugin.running,
                         onClick: () => { plugin.stopSession("preview"); plugin.play("preview"); }},
-                    {type: "button", id: "stopPreview", name: "Остановить проверку", children: "Стоп", onClick: () => plugin.stopSession("preview")},
-                    {type: "dropdown", id: "sound", name: "Какой сигнал заменять", note: "По умолчанию — call_ringing. Альтернативный call_calling в некоторых версиях относится к исходящему вызову.",
-                        value: settings.sound, options: [{label: "call_ringing (по умолчанию)", value: "call_ringing"}, {label: "call_calling (альтернативный сигнал)", value: "call_calling"}]},
-                    {type: "button", id: "connection", name: "Подключение к Discord", note: plugin.status, children: "Проверить снова", disabled: !plugin.running,
+                    {type: "button", id: "stopPreview", name: t("stopPreview"), children: t("stop"), onClick: () => plugin.stopSession("preview")},
+                    {type: "dropdown", id: "sound", name: t("signal"), note: t("signalNote"),
+                        value: settings.sound, options: [{label: t("incomingOption"), value: "call_ringing"}, {label: t("alternativeOption"), value: "call_calling"}]},
+                    {type: "button", id: "connection", name: t("connection"), note: plugin.status, children: t("retry"), disabled: !plugin.running,
                         onClick: () => { plugin.attach(); plugin.notify(plugin.status, plugin.unpatches.length ? "success" : "warning"); }}
                 ]
             });

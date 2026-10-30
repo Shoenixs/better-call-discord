@@ -1,20 +1,22 @@
-# Проверка перед выпуском
+# Release validation
 
-## Автоматически
+## Automated checks
 
-Запусти `npm run check` и `npm test` на Node.js 22+. Тесты самодостаточны, не требуют Discord, учётной записи, звукового устройства или файлов из домашнего каталога. Они проверяют логику через имитацию API; аудио в системе не воспроизводится.
+Run `npm run check` and `npm test` on Node.js 22+. Tests are self-contained: they do not require Discord, an account, an audio device or personal files. They use API mocks and do not play audio on the system.
 
-## В клиенте
+## In-client checks
 
-Временно отключи другие плагины, меняющие звонок. Не публикуй личные данные из конфигурации.
+Temporarily disable other ringtone replacement plugins. Do not publish personal configuration data.
 
-1. Выбери свой небольшой MP3 или WAV. Убедись, что «Послушать» воспроизводит его и плавно повышает громкость, а «Стоп» прекращает звук.
-2. Дождись настоящего входящего звонка. Должна звучать одна пользовательская мелодия с нарастанием.
-3. Проверь остановку при ответе, отклонении и отмене вызова звонящим.
-4. Проверь новый звонок: начальная громкость должна сброситься. Для сезонного набора, если он доступен в клиенте, повтори сценарий.
-5. При выбранном `call_ringing` проверь исходящий вызов: его сигнал должен остаться штатным.
-6. Проверь штатные звуки входа/выхода из голосового канала, микрофона и наушников. Другие уведомления тоже должны работать.
-7. Отключи плагин и убедись в возврате штатного поведения. Повторное включение должно восстановить настройки.
-8. Укажи некорректный аудиофайл: должно появиться понятное сообщение, а предыдущая успешно загруженная мелодия должна остаться доступной.
+1. Select a small MP3 or WAV. Confirm that **Listen** plays it with increasing volume and **Stop** stops the preview.
+2. Receive an actual incoming call. Only the custom ringtone should play, with the configured fade-in.
+3. Check that answering, declining and cancellation by the caller stop playback.
+4. Receive another call: the starting volume must reset. Repeat with a seasonal sound pack if available.
+5. With `call_ringing` selected, make an outgoing call: its signal should remain unchanged.
+6. Check native voice join/leave, mute/unmute and deafen/undeafen sounds, plus other notifications.
+7. Disable the plugin and confirm default behavior. Re-enable it and confirm settings are restored.
+8. Select an invalid audio file: an actionable error should appear and the previous successfully loaded file should remain available.
+9. Switch **Language** between English and Russian. Labels, hints, file dialog, connection status and plugin notifications should follow the selection. The choice must survive re-enabling the plugin.
+10. Select **Auto (Discord)**. Verify Russian for Russian Discord and English for English or unsupported locales. Changing the language must not interrupt an active ringtone.
 
-Записывай версии Discord, BetterDiscord и плагина, платформу и результаты. Обнаруженный класс и число перехватов подтверждают подключение к клиенту, но сами по себе не подтверждают слышимое воспроизведение.
+Record Discord, BetterDiscord and plugin versions, platform and outcomes. Discovering a class and installing patches confirms the connection to the client; it does not by itself confirm audible playback.

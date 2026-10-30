@@ -89,7 +89,7 @@ const Plugin = sandbox.module.exports;
     assert.ok(!ring.nativePlayed, 'native audio suppressed');
     ring.stop(); assert.equal(plugin.sessions.size, 0);
     const panel = plugin.getSettingsPanel();
-    assert.ok(panel.settings.find(setting => setting.id === 'connection').note.includes('найден.'));
+    assert.ok(panel.settings.find(setting => setting.id === 'connection').note.includes('Sound module found.'));
     assert.equal(panel.settings.find(setting => setting.id === 'preview').disabled, false);
     plugin.stop();
     assert.equal(plugin.soundAbort, null);
